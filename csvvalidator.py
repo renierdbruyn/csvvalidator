@@ -200,7 +200,7 @@ class CSVValidator(object):
     def add_value_check(self, field_name, value_check,
                         code=VALUE_CHECK_FAILED,
                         message=MESSAGES[VALUE_CHECK_FAILED],
-                        modulus=1):
+                        modulus=1, allow_empty=True):
         """
         Add a value check function for the specified field.
 
@@ -227,7 +227,7 @@ class CSVValidator(object):
         assert field_name in self._field_names, 'unexpected field name: %s' % field_name
         assert callable(value_check), 'value check must be a callable function'
 
-        t = field_name, value_check, code, message, modulus
+        t = field_name, value_check, code, message, modulus, allow_empty
         self._value_checks.append(t)
 
 
@@ -521,12 +521,14 @@ class CSVValidator(object):
                             context=None):
         """Apply value check functions on the given record `r`."""
 
-        for field_name, check, code, message, modulus in self._value_checks:
+        for field_name, check, code, message, modulus, allow_empty in self._value_checks:
             if i % modulus == 0: # support sampling
                 fi = self._field_names.index(field_name)
                 if fi < len(r): # only apply checks if there is a value
                     value = r[fi]
                     try:
+                        if allow_empty and not value:
+                            break
                         check(value)
                     except ValueError:
                         p = {'code': code}
@@ -927,7 +929,7 @@ def enumeration(*args):
 
     """
 
-    assert len(args) > 0, 'at least one argument is required'
+    assert len(args) > 0, 'at least one argument is allow_empty'
     if len(args) == 1:
         # assume the first argument defines the membership
         members = args[0]
