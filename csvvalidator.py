@@ -80,6 +80,7 @@ see the example.py and tests.py modules in the source code repository.
 
 import re
 from datetime import datetime
+from dateutil.parser import parse
 
 
 UNEXPECTED_EXCEPTION = 0
@@ -1011,6 +1012,19 @@ def datetime_string(format):
 
     def checker(v):
         datetime.strptime(v, format)
+    return checker
+
+def datetime_parse(date_string, dayfirst=False, yearfirst=True):
+    """
+    Return a value check function which raises a ValueError if the supplied
+    value cannot be converted to a datetime using dateutil parser using the .
+
+    See also `dateutil.parser.parse`.
+
+    """
+
+    def checker(v, **kwargs):
+        parse(v, **kwargs)
     return checker
 
 
