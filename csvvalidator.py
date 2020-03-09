@@ -80,7 +80,7 @@ see the example.py and tests.py modules in the source code repository.
 
 import re
 from datetime import datetime
-from dateutil.parser import parse
+import dateutil
 
 
 UNEXPECTED_EXCEPTION = 0
@@ -1025,7 +1025,7 @@ def datetime_parse(is_dayfirst, is_yearfirst):
 
     def checker(v):
         try:
-            parse(v, dayfirst=is_dayfirst, yearfirst=is_yearfirst)
+            dateutil.parser.parse(v, dayfirst=is_dayfirst, yearfirst=is_yearfirst)
         except ValueError as e:
             raise ValueError(e)
     return checker
