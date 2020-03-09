@@ -1,6 +1,11 @@
 #!/usr/bin/env python
 
-from distutils.core import setup
+# from distutils.core import setup
+from setuptools import setup, find_packages
+
+requires = [
+      'python-dateutil',
+]
 
 setup(name='csvvalidator',
       version='1.3-SNAPSHOT',
@@ -15,5 +20,7 @@ setup(name='csvvalidator',
                    'License :: OSI Approved :: MIT License',
                    'Programming Language :: Python',
                    'Topic :: Software Development :: Libraries :: Python Modules'
-                   ]
+                   ],
+      find_packages=find_packages(),
+      install_requires=requires,
       )
