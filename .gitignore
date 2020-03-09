@@ -1,7 +1,10 @@
+*.egg-info
+*.vscode
 *.pyc
 *~
 .coverage
 dist
 build
 MANIFEST
+
 
