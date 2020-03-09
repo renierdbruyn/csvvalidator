@@ -8,7 +8,7 @@ requires = [
 ]
 
 setup(name='csvvalidator',
-      version='1.3-SNAPSHOT',
+      version='1.4-SNAPSHOT',
       author='Alistair Miles',
       author_email='alimanfoo@googlemail.com',
       url='https://github.com/alimanfoo/csvvalidator',

@@ -1014,7 +1014,7 @@ def datetime_string(format):
         datetime.strptime(v, format)
     return checker
 
-def datetime_parse(dayfirst=False, yearfirst=False):
+def datetime_parse(is_dayfirst, is_yearfirst):
     """
     Return a value check function which raises a ValueError if the supplied
     value cannot be converted to a datetime using dateutil parser using the .
@@ -1023,8 +1023,11 @@ def datetime_parse(dayfirst=False, yearfirst=False):
 
     """
 
-    def checker(v, dayfirst=dayfirst, yearfirst=yearfirst):
-        parse(v, dayfirst=dayfirst, yearfirst=yearfirst)
+    def checker(v):
+        try:
+            parse(v, dayfirst=is_dayfirst, yearfirst=is_yearfirst)
+        except ValueError as e:
+            raise ValueError(e)
     return checker
 
 
