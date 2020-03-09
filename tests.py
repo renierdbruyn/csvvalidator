@@ -13,7 +13,7 @@ from csvvalidator import CSVValidator, VALUE_CHECK_FAILED, MESSAGES,\
     VALUE_PREDICATE_FALSE, RECORD_PREDICATE_FALSE, UNIQUE_CHECK_FAILED,\
     ASSERT_CHECK_FAILED, UNEXPECTED_EXCEPTION, write_problems, datetime_string,\
     RECORD_CHECK_FAILED, datetime_range_inclusive, datetime_range_exclusive,\
-    RecordError
+    RecordError, datetime_parse
 
 
 # logging setup
@@ -394,6 +394,80 @@ def test_value_checks_datetime():
     assert problems[2]['row'] == 5 and problems[2]['field'] == 'bar'
 
 
+def test_value_checks_datetime_parser():
+    """Test value checks with datetimes parser."""
+
+    field_names = ('foo', 'bar')
+    validator = CSVValidator(field_names)
+    validator.add_value_check('bar', datetime_parse())
+
+    data = (
+            ('foo', 'bar'),
+            ('A', '1999-09-09'), # valid
+            ('B', '31-12-2009'), # valid
+            ('C', '12-31-2032'), # valid
+            ('D', '1999-09-09ss'), # invalid string
+            )
+
+    problems = validator.validate(data)
+    print(problems)
+    assert len(problems) == 1, problems
+    for p in problems:
+        assert p['code'] == VALUE_CHECK_FAILED
+
+    assert problems[0]['row'] == 5 and problems[0]['field'] == 'bar'
+
+
+def test_value_checks_datetime_parser_year():
+    """Test value checks with datetimes parser yearfirst."""
+
+    field_names = ('foo', 'bar')
+    validator = CSVValidator(field_names)
+    validator.add_value_check('bar', datetime_parse(yearfirst=True))
+
+    data = (
+            ('foo', 'bar'),
+            ('A', '1999-09-09'), # valid
+            ('B', '1999-13-09'), # invalid month
+            ('C', '1999-09-32'), # invalid day
+            ('D', '1999-09-09ss') # invalid string
+            )
+
+    problems = validator.validate(data)
+    assert len(problems) == 3, problems
+    for p in problems:
+        assert p['code'] == VALUE_CHECK_FAILED
+
+    assert problems[0]['row'] == 3 and problems[0]['field'] == 'bar'
+    assert problems[1]['row'] == 4 and problems[1]['field'] == 'bar'
+    assert problems[2]['row'] == 5 and problems[2]['field'] == 'bar'
+
+
+def test_value_checks_datetime_parser_day():
+    """Test value checks with datetimes parser."""
+
+    field_names = ('foo', 'bar')
+    validator = CSVValidator(field_names)
+    validator.add_value_check('bar', datetime_parse(dayfirst=True))
+
+    data = (
+            ('foo', 'bar'),
+            ('A', '01-09-1991'), # valid
+            ('B', '05-24-1999'), # valid
+            ('C', '33-01-1991'), # invalid day
+            ('D', '1999-09-09ss'), # invalid string
+            ('E', '31-12-1999'), # valid
+            )
+
+    problems = validator.validate(data)
+    assert len(problems) == 2, problems
+    for p in problems:
+        assert p['code'] == VALUE_CHECK_FAILED
+
+    assert problems[0]['row'] == 4 and problems[0]['field'] == 'bar'
+    assert problems[1]['row'] == 5 and problems[1]['field'] == 'bar'
+
+
 def test_value_checks_datetime_range():
     """Test value checks with datetime ranges."""
 
@@ -663,7 +737,8 @@ def test_compound_unique_checks_with_variable_record_lengths():
             )
 
     problems = validator.validate(data)
-    print problems
+    print("problems")
+    print(problems)
     n = len(problems)
     assert n == 1, n
 
